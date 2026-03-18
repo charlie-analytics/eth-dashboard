@@ -8,7 +8,7 @@ eth = yf.download("ETH-USD", period="30d", interval="1h")
 
 price = eth["Close"]
 
-# RSI
+# RSI Calculation
 delta = price.diff()
 gain = delta.clip(lower=0)
 loss = -delta.clip(upper=0)
@@ -26,16 +26,22 @@ st.line_chart(price)
 st.subheader("RSI")
 st.line_chart(rsi)
 
-# SIGNAL LOGIC
-latest_rsi = rsi.iloc[-1]
+# FIXED SIGNAL LOGIC
+valid_rsi = rsi.dropna()
 
-st.subheader("Signal")
+if not valid_rsi.empty:
+    latest_rsi = valid_rsi.iloc[-1]
 
-if latest_rsi > 70:
-    st.error("Overbought → Pullback Risk")
-elif latest_rsi < 30:
-    st.success("Oversold → Bounce Zone")
+    st.subheader("Signal")
+
+    if latest_rsi > 70:
+        st.error("Overbought → Pullback Risk")
+    elif latest_rsi < 30:
+        st.success("Oversold → Bounce Zone")
+    else:
+        st.info("Neutral → Trend Continuation Possible")
+
+    st.write(f"Current RSI: {round(latest_rsi, 2)}")
+
 else:
-    st.info("Neutral → Trend Continuation Possible")
-
-st.write(f"Current RSI: {round(latest_rsi,2)}")
+    st.warning("Not enough data to calculate RSI yet.")
