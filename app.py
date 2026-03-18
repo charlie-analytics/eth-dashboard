@@ -1,5 +1,6 @@
 import streamlit as st
 import yfinance as yf
+import numpy as np
 
 st.title("Ethereum Market Dashboard")
 
@@ -26,22 +27,25 @@ st.line_chart(price)
 st.subheader("RSI")
 st.line_chart(rsi)
 
-# FIXED SIGNAL LOGIC
+# SAFE SIGNAL LOGIC
+st.subheader("Signal")
+
 valid_rsi = rsi.dropna()
 
-if not valid_rsi.empty:
-    latest_rsi = valid_rsi.iloc[-1]
+if len(valid_rsi) > 0:
+    latest_rsi = float(valid_rsi.iloc[-1])
 
-    st.subheader("Signal")
-
-    if latest_rsi > 70:
-        st.error("Overbought → Pullback Risk")
-    elif latest_rsi < 30:
-        st.success("Oversold → Bounce Zone")
+    if np.isnan(latest_rsi):
+        st.warning("RSI not ready yet.")
     else:
-        st.info("Neutral → Trend Continuation Possible")
+        if latest_rsi > 70:
+            st.error("Overbought → Pullback Risk")
+        elif latest_rsi < 30:
+            st.success("Oversold → Bounce Zone")
+        else:
+            st.info("Neutral → Trend Continuation Possible")
 
-    st.write(f"Current RSI: {round(latest_rsi, 2)}")
+        st.write(f"Current RSI: {round(latest_rsi, 2)}")
 
 else:
-    st.warning("Not enough data to calculate RSI yet.")
+    st.warning("Not enough data yet.")
