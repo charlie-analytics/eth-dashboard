@@ -27,6 +27,34 @@ st.line_chart(price)
 st.subheader("RSI")
 st.line_chart(rsi)
 
+# Z-SCORE MODEL
+window = 30
+
+mean = price.rolling(window).mean()
+std = price.rolling(window).std()
+
+z_score = (price - mean) / std
+
+st.subheader("Z-Score")
+st.line_chart(z_score)
+
+# Z-score Signal
+valid_z = z_score.dropna()
+
+if len(valid_z) > 0:
+    latest_z = float(valid_z.iloc[-1])
+
+    st.subheader("Z-Score Signal")
+
+    if latest_z > 2:
+        st.error("Overextended → Pullback Likely")
+    elif latest_z < -2:
+        st.success("Undervalued → Bounce Zone")
+    else:
+        st.info("Normal Range → Healthy Trend")
+
+    st.write(f"Current Z-Score: {round(latest_z, 2)}")
+
 # SAFE SIGNAL LOGIC
 st.subheader("Signal")
 
