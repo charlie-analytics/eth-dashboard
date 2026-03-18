@@ -1,16 +1,15 @@
 import streamlit as st
 import yfinance as yf
 
-st.title("Ethereum Dashboard")
+st.title("Ethereum Market Dashboard")
 
 # Fetch ETH data
 eth = yf.download("ETH-USD", period="30d", interval="1h")
 
-st.subheader("ETH Price Chart")
-st.line_chart(eth["Close"])
+price = eth["Close"]
 
-# Simple RSI
-delta = eth["Close"].diff()
+# RSI
+delta = price.diff()
 gain = delta.clip(lower=0)
 loss = -delta.clip(upper=0)
 
@@ -20,5 +19,23 @@ avg_loss = loss.rolling(14).mean()
 rs = avg_gain / avg_loss
 rsi = 100 - (100 / (1 + rs))
 
+# Charts
+st.subheader("ETH Price")
+st.line_chart(price)
+
 st.subheader("RSI")
 st.line_chart(rsi)
+
+# SIGNAL LOGIC
+latest_rsi = rsi.iloc[-1]
+
+st.subheader("Signal")
+
+if latest_rsi > 70:
+    st.error("Overbought → Pullback Risk")
+elif latest_rsi < 30:
+    st.success("Oversold → Bounce Zone")
+else:
+    st.info("Neutral → Trend Continuation Possible")
+
+st.write(f"Current RSI: {round(latest_rsi,2)}")
