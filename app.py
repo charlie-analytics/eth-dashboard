@@ -77,3 +77,33 @@ if len(valid_rsi) > 0:
 
 else:
     st.warning("Not enough data yet.")
+
+# -----------------------
+# FINAL SIGNAL LAYER
+# -----------------------
+
+st.subheader("Final Signal")
+
+if len(valid_rsi) > 0 and len(valid_z) > 0:
+    r = float(valid_rsi.iloc[-1])
+    z = float(valid_z.iloc[-1])
+
+    if r > 70 and z > 2:
+        st.error("High Risk → Overheated Market (Pullback Likely)")
+
+    elif r < 30 and z < -2:
+        st.success("Strong Buy Zone → Deep Oversold")
+
+    elif r > 50 and z < 1:
+        st.success("Healthy Uptrend → Continuation Likely")
+
+    elif r < 50 and z > 1:
+        st.warning("Weak Structure → Possible Rejection")
+
+    else:
+        st.info("Neutral Zone → Wait for Direction")
+
+    st.write(f"RSI: {round(r,2)} | Z-Score: {round(z,2)}")
+
+else:
+    st.warning("Not enough data for final signal.")
